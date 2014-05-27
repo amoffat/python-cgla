@@ -1,5 +1,5 @@
-Simple linear algebra library of computer graphics
-==================================================
+Linear algebra library for computer graphics
+============================================
 
 Why
 ---
@@ -9,3 +9,20 @@ is very painful.
 
 Examples
 --------
+
+```python
+from cgla import Vec, Mat
+
+mat = Mat([
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+])
+```
+
+Output:
+```
+| 1 2 3 |
+| 4 5 6 |
+| 7 8 9 |
+```
