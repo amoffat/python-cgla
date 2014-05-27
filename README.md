@@ -71,8 +71,13 @@ print mat[1][2]
 
 Output:
 ```
-0
-997
+| 1 0 0 |
+| 0 1 0 |
+| 0 0 1 |
+
+|   1   0   0 |
+|   0   1   0 |
+|   0 997   1 |
 ```
 
 ### Creating a vector
@@ -99,32 +104,6 @@ Output:
 3
 6
 5
-```
-
-### Rotating a vector
-
-Rotating a vector involves creating a new rotation matrix with
-`Mat.new_rotation(x=0, y=0, z=0)` then multiplying that matrix with a vector.
-The resulting vector is smart: when printed, any values that can be
-converted to a friendlier form will be substituted for the original numeric
-value.
-
-```python
-from cgla import Vec, Mat
-from math import pi
-
-rot = Mat.new_rotation(0, pi/4, 0)
-vec = Vec(1, 0, 0)
-
-rotated_vec = rot * vec
-print rotated_vec
-```
-
-Output:
-```
-|  cos(π/4) |
-|         0 |
-| sin(-π/4) |
 ```
 
 ### Matrix columns are vectors
@@ -155,4 +134,63 @@ Output:
 | 304   2   3 |
 |   4   5   6 |
 |   7   8   9 |
+```
+
+### Rotating a vector
+
+Rotating a vector involves multiplying a rotation matrix with a vector.
+The resulting vector is smart: when printed, any values that can be
+converted to a friendlier form will be substituted for the original numeric
+value.
+
+```python
+from cgla import Vec, Mat
+from math import pi
+
+# create a new rotation matrix with 0 radian rotation around the x-axis,
+# pi/4 radian (45 degrees) rotation around the y-axis, and 0 radian rotaiton
+# about the z-axis
+rot = Mat.new_rotation(0, pi/4, 0)
+
+vec = Vec(1, 0, 0)
+
+rotated_vec = rot * vec
+print rotated_vec
+```
+
+Output:
+```
+|  cos(π/4) |
+|         0 |
+| sin(-π/4) |
+```
+
+### Other vector operations
+
+```python
+from cgla import Vec, Mat
+
+vec = Vec(2, 3, 1.3)
+
+# magnitude or length
+print vec.magnitude()
+
+# normalized
+print vec.normalize()
+
+# add vectors
+print vec + Vec(1, 2, 1)
+```
+
+Output:
+```
+3.83275357935
+
+| 0.52 |
+| 0.78 |
+| 0.34 |
+
+|    3 |
+|    5 |
+| 2.30 |
 ```
