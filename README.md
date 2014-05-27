@@ -16,16 +16,31 @@ efficiency and performance.
 Examples
 --------
 
-### Printing a matrix
+### Creating a matrix
 
 ```python
 from cgla import Vec, Mat
 
+# creating as a list of lists, with each sub list as a matrix row
 mat = Mat([
     [1, 2, 3],
     [4, 5, 6],
     [7, 8, 9]
 ])
+print mat
+
+# or if you're sloppy, each matrix row is an individual argument.  this has the
+# exact same result as above
+mat = Mat(
+	[1, 2, 3]
+	[4, 5, 6],
+	[7, 8, 9]
+)
+
+# you can also create a matrix empty, just by specifying the number of columns
+# and rows it should have
+mat = Mat(3, 4)
+print mat
 ```
 
 Output:
@@ -33,6 +48,31 @@ Output:
 | 1 2 3 |
 | 4 5 6 |
 | 7 8 9 |
+
+| 0 0 0 |
+| 0 0 0 |
+| 0 0 0 |
+| 0 0 0 |
+```
+
+### Manipulating a matrix
+```python
+from cgla import Vec, Mat
+
+# create a 3x3 identity matrix
+mat = Mat.new_identity(3)
+
+# the coordinates are x, y, (or if you prefer: col, row)
+print mat[1][2]
+mat[1][2] = 997
+
+print mat[1][2]
+```
+
+Output:
+```
+0
+997
 ```
 
 ### Creating a vector
@@ -40,7 +80,6 @@ Output:
 ```python
 from cgla import Vec, Mat
 from math import pi
-
 
 # a three-dimensional vector
 vec3 = Vec(1, 2, 3)
@@ -74,7 +113,6 @@ value.
 from cgla import Vec, Mat
 from math import pi
 
-
 rot = Mat.new_rotation(0, pi/4, 0)
 vec = Vec(1, 0, 0)
 
@@ -89,6 +127,32 @@ Output:
 | sin(-π/4) |
 ```
 
-### Accessing matrix elements
+### Matrix columns are vectors
 ```python
+from cgla import Vec, Mat
+
+mat = Mat(
+	[1, 2, 3],
+	[4, 5, 6],
+	[7, 8, 9],
+)
+
+vec = mat[0]
+print vec
+
+# and changing that column vector changes the corresponding matrix column
+# and vice versa
+vec.x = 304
+print mat
+```
+
+Output:
+```
+| 1 |
+| 4 |
+| 7 |
+
+| 304   2   3 |
+|   4   5   6 |
+|   7   8   9 |
 ```
