@@ -439,24 +439,30 @@ class Vec(Mat):
     
     def _potentially_padded(self):
         vec = self
+        padded = False
         if len(vec) == 3:
-            vec = vec.append(1)
-        return vec            
+            vec = vec.appended(1)
+            padded = True
+        return vec, padded
+    
+    def _apply_transformation(self, mat):
+        vec, padded = self._potentially_padded()
+        res = mat * vec
+        if padded:
+            res = Vec(res[:3])
+        return res
     
     def translated(self, x=0, y=0, z=0):
         mat = Mat.new_translation(x, y, z)
-        res = mat * self._potentially_padded()
-        return res
+        return self._apply_transformation(mat)
     
     def scaled(self, x=1, y=1, z=1):
         mat = Mat.new_scale(x, y, z)
-        res = mat * self._potentially_padded()
-        return res
+        return self._apply_transformation(mat)
     
     def rotated(self, x=0, y=0, z=0):
         mat = Mat.new_rotation(x, y, z)
-        res = mat * self._potentially_padded()
-        return res
+        return self._apply_transformation(mat)
     
     def appended(self, item):
         new_cells = deepcopy(self.row_major_cells)
