@@ -112,6 +112,20 @@ class VecTests(unittest.TestCase):
         self.assertEqual(v, Vec(1, 2, 3, 4))
         
         
+    def test_translated(self):
+        vec = Vec(1, 0, 0, 1)
+        self.assertEqual(vec.translated(1, 2, 3), Vec(2, 2, 3, 1))
+        
+    def test_scaled(self):
+        vec = Vec(4, 1, 3, 1)
+        self.assertEqual(vec.scaled(0.5, 2.0, 1), Vec(2, 2, 3, 1))
+        
+        
+    def test_rotated(self):
+        vec = Vec(1, 0, 0, 1)
+        self.assertEqual(vec.rotated(0, -pi/2, 0), Vec(0, 0, 1, 1))
+        
+        
         
 class MatTests(unittest.TestCase):
     def test_square_mat(self):

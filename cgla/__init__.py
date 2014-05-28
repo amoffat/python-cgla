@@ -437,6 +437,27 @@ class Vec(Mat):
         s = "<Vec: \n%s>" % self
         return s
     
+    def _potentially_padded(self):
+        vec = self
+        if len(vec) == 3:
+            vec = vec.append(1)
+        return vec            
+    
+    def translated(self, x=0, y=0, z=0):
+        mat = Mat.new_translation(x, y, z)
+        res = mat * self._potentially_padded()
+        return res
+    
+    def scaled(self, x=1, y=1, z=1):
+        mat = Mat.new_scale(x, y, z)
+        res = mat * self._potentially_padded()
+        return res
+    
+    def rotated(self, x=0, y=0, z=0):
+        mat = Mat.new_rotation(x, y, z)
+        res = mat * self._potentially_padded()
+        return res
+    
     def appended(self, item):
         new_cells = deepcopy(self.row_major_cells)
         new_cells.append([item])
