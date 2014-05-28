@@ -76,6 +76,11 @@ class Mat(object):
             for x in xrange(len(cells)):
                 cell = cells[x][y]
                 self.set_cell(y, x, cell)
+                
+        for i, cell in enumerate(cells):
+            if isinstance(cell, Vec):
+                vec = self.row(i)
+                cell._mat_parent = vec._mat_parent
         
 
     def _new_from_schema(self, cols, rows):
@@ -128,7 +133,9 @@ class Mat(object):
         def setter(i, v):
             self.set_cell(baked_index, i, v)
             
-        return Vec(self.col_major_cells[i], mat_parent=(getter, setter))
+        vec = Vec(self.col_major_cells[i])
+        vec._set_mat_parent(getter, setter)
+        return vec
     
     
     def row(self, i):
@@ -143,7 +150,9 @@ class Mat(object):
         def setter(i, v):
             self.set_cell(i, baked_index, v)
             
-        return Vec(self.row_major_cells[i], mat_parent=(getter, setter))
+        vec = Vec(self.row_major_cells[i])
+        vec._set_mat_parent(getter, setter)
+        return vec
     
         
     @classmethod
@@ -317,8 +326,8 @@ class Vec(Mat):
         # sometimes a vector is really a column of a matrix.  in that case,
         # we store a linkage to the matrix, so that we can proxy our setitems
         # and getitems to that matrix, and changes to the matrix reflect in
-        # our vector
-        self._mat_parent = kwargs.pop("mat_parent", None)
+        # our vector.  see _set_mat_parent
+        self._mat_parent = None
         
         # they've specified a vector like Vec(x=1, y=2, z=3)
         if kwargs:
@@ -342,6 +351,11 @@ class Vec(Mat):
             for value in components:
                 values.append([value]) 
             super(Vec, self).__init__(values)
+            
+    
+    def _set_mat_parent(self, getter, setter):
+        self._mat_parent = (getter, setter)
+            
 
     def copy(self):
         """ useful if a Vec is linked to a Mat row/col.  this essentially
@@ -391,14 +405,15 @@ class Vec(Mat):
         s = "<Vec: \n%s>" % self
         return s
     
-    def coordinate_system(self, row):
+    def coordinate_system(self):
         v1 = self
         if abs(v1.x) > abs(v1.y):
             v2 = Vec(-v1.z, 0, v1.x).normalize()
         else:
             v2 = Vec(0, v1.z, -v1.y).normalize()
         v3 = cross(v1, v2)
-        #import pdb;pdb.set_trace()
+        
+        return Mat(v1, v2, v3)
             
         
     def distance(self, other):

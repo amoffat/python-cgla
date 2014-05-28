@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
-from la import num_length, Mat, Vec, cross, dot, radians
-from la.friendly import whole_num, pi_multiple, trig, match
+from cgla import num_length, Mat, Vec, cross, dot, radians
+from cgla.friendly import whole_num, pi_multiple, trig, match
 import unittest
 import sys
 from math import pi, sqrt, tan, cos, sin
@@ -97,7 +97,14 @@ class VecTests(unittest.TestCase):
         
     def test_coordinate_system(self):
         v = Vec(1, 0, 0)
-        mat = v.coordinate_system(0)
+        mat = v.coordinate_system()
+        
+        correct = Mat(
+            [1, 0, 0],
+            [0, 0, 1],
+            [0, -1, 0]
+        )
+        self.assertEqual(mat, correct)
         
         
         
@@ -169,6 +176,27 @@ class MatTests(unittest.TestCase):
         self.assertEqual(mat[0][1], 4)
         self.assertEqual(mat[1][1], 5)
         self.assertEqual(mat[2][1], 6)
+        
+        
+    def test_mat_from_vecs(self):
+        v1 = Vec(1, 2, 3)
+        v2 = Vec(4, 5, 6)
+        
+        mat = Mat(v1, v2)
+        
+        correct = Mat([
+            [1, 2, 3],
+            [4, 5, 6]
+        ])
+        self.assertEqual(mat, correct)
+        
+        v1.z = 39
+        v2.y = 25
+        correct = Mat([
+            [1, 2, 39],
+            [4, 25, 6]
+        ])
+        self.assertEqual(mat, correct)
         
         
         
