@@ -166,25 +166,38 @@ class Mat(object):
         )
         return mat
     
+    
+    @classmethod
+    def new_scale(cls, x=1, y=1, z=1):
+        mat = Mat(
+            [x, 0, 0, 0],
+            [0, y, 0, 0],
+            [0, 0, z, 0],
+            [0, 0, 0, 1],
+        )
+        return mat
         
     @classmethod
     def new_rotation(cls, x=0, y=0, z=0):
         x_mat = Mat([
-            [1, 0, 0],
-            [0, cos(x), -sin(x)],
-            [0, sin(x), cos(x)],
+            [1, 0, 0, 0],
+            [0, cos(x), -sin(x), 0],
+            [0, sin(x), cos(x), 0],
+            [0, 0, 0, 1],
         ])
         
         y_mat = Mat([
-            [cos(y), 0, sin(y)],
-            [0, 1, 0],
-            [-sin(y), 0, cos(y)]
+            [cos(y), 0, sin(y), 0],
+            [0, 1, 0, 0],
+            [-sin(y), 0, cos(y), 0],
+            [0, 0, 0, 1],
         ])
         
         z_mat = Mat([
-            [cos(z), -sin(z), 0],
-            [sin(z), cos(z), 0],
-            [0, 0, 1],
+            [cos(z), -sin(z), 0, 0],
+            [sin(z), cos(z), 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1],
         ])
         
         final_mat = x_mat * y_mat * z_mat
@@ -290,13 +303,9 @@ class Mat(object):
         # another matrix
         if isinstance(other, Mat):
             if not cols_match_rows(self, other):
-                if isinstance(other, Vec) and len(other) == 3:
-                    other = other.appended(0)
-                else:
-                    raise InvalidSizes
+                raise InvalidSizes
             
             result = Mat(other.cols, self.rows)
-            
             for y in xrange(self.rows):
                 for mat_x in xrange(other.cols):
                     sum = 0                        
@@ -304,6 +313,9 @@ class Mat(object):
                         sum += self.get_cell(x, y) * other.get_cell(mat_x, x)
                     result.set_cell(mat_x, y, sum)
                     
+            if isinstance(other, Vec):
+                result = result[0]
+                
             return result
             
         # a scalar              
