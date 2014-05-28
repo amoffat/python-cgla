@@ -36,10 +36,10 @@ class VecTests(unittest.TestCase):
         self.assertTrue(abs(vec.magnitude() - correct) < 0.00001)
         
         
-    def test_normalize(self):
+    def test_normalized(self):
         vec = Vec(2, 0, 0)
-        self.assertEqual(vec.normalize(), Vec(1, 0, 0))
-        self.assertTrue(isinstance(vec.normalize(), Vec))
+        self.assertEqual(vec.normalized(), Vec(1, 0, 0))
+        self.assertTrue(isinstance(vec.normalized(), Vec))
         
     def test_normalize_in_place(self):
         vec = Vec(2, 0, 0)
@@ -105,6 +105,11 @@ class VecTests(unittest.TestCase):
             [0, -1, 0]
         )
         self.assertEqual(mat, correct)
+        
+    def test_appended(self):
+        v = Vec(1, 2, 3)
+        v = v.appended(4)
+        self.assertEqual(v, Vec(1, 2, 3, 4))
         
         
         
@@ -347,6 +352,39 @@ sin(-\xcf\x80/4)     -0.35      0.61 |")
             [49, 64]
         )
         self.assertEqual(mat2*mat1, correct)
+        
+        
+    def test_appended(self):
+        mat = Mat(
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
+        )
+        mat = mat.appended(Vec(1, 2, 3))
+        
+        correct = Mat(
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+            [1, 2, 3]
+        )
+        self.assertEqual(mat, correct)
+        
+        
+    def test_trans_mat(self):
+        mat = Mat.new_translation(1, 2, 3)
+        correct = Mat(
+            [1, 0, 0, 1],
+            [0, 1, 0, 2],
+            [0, 0, 1, 3],
+            [0, 0, 0, 1]
+        )
+        self.assertEqual(mat, correct)
+        
+        mat = Mat.new_translation(1, 2, 3)
+        vec = Vec(1, 0, 0)
+        mat * vec
+        
         
         
     def test_rot_mat(self):

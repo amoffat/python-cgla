@@ -3,6 +3,7 @@
 from math import pi, sin, cos, floor, log, degrees, radians, sqrt, pow
 import math
 import operator as op
+from copy import deepcopy
 from . import friendly
 
     
@@ -134,7 +135,7 @@ class Mat(object):
             self.set_cell(baked_index, i, v)
             
         vec = Vec(self.col_major_cells[i])
-        vec._set_mat_parent(getter, setter)
+        vec._mat_parent = (getter, setter)
         return vec
     
     
@@ -151,8 +152,19 @@ class Mat(object):
             self.set_cell(i, baked_index, v)
             
         vec = Vec(self.row_major_cells[i])
-        vec._set_mat_parent(getter, setter)
+        vec._mat_parent = (getter, setter)
         return vec
+    
+    
+    @classmethod
+    def new_translation(cls, x=0, y=0, z=0):
+        mat = Mat(
+            [1, 0, 0, x],
+            [0, 1, 0, y],
+            [0, 0, 1, z],
+            [0, 0, 0, 1],
+        )
+        return mat
     
         
     @classmethod
@@ -256,6 +268,15 @@ class Mat(object):
         return s
     
     
+    def appended(self, row):
+        """ this method is appended, and not "append", because it does not
+        mutate the existing Mat/Vec, it returns a new one with the new data
+        appended """
+        new_cells = deepcopy(self.row_major_cells)
+        new_cells.append(row)
+        return Mat(new_cells)
+    
+    
     def __add__(self, other):
         assert_same_size(self, other)
         result = pair_map(op.add, self, other)
@@ -269,18 +290,21 @@ class Mat(object):
         # another matrix
         if isinstance(other, Mat):
             if not cols_match_rows(self, other):
-                raise InvalidSizes
-            else:
-                result = Mat(other.cols, self.rows)
-                
-                for y in xrange(self.rows):
-                    for mat_x in xrange(other.cols):
-                        sum = 0                        
-                        for x in xrange(self.cols):
-                            sum += self.get_cell(x, y) * other.get_cell(mat_x, x)
-                        result.set_cell(mat_x, y, sum)
-                        
-                return result
+                if isinstance(other, Vec) and len(other) == 3:
+                    other = other.appended(0)
+                else:
+                    raise InvalidSizes
+            
+            result = Mat(other.cols, self.rows)
+            
+            for y in xrange(self.rows):
+                for mat_x in xrange(other.cols):
+                    sum = 0                        
+                    for x in xrange(self.cols):
+                        sum += self.get_cell(x, y) * other.get_cell(mat_x, x)
+                    result.set_cell(mat_x, y, sum)
+                    
+            return result
             
         # a scalar              
         else:
@@ -326,7 +350,7 @@ class Vec(Mat):
         # sometimes a vector is really a column of a matrix.  in that case,
         # we store a linkage to the matrix, so that we can proxy our setitems
         # and getitems to that matrix, and changes to the matrix reflect in
-        # our vector.  see _set_mat_parent
+        # our vector.
         self._mat_parent = None
         
         # they've specified a vector like Vec(x=1, y=2, z=3)
@@ -351,10 +375,6 @@ class Vec(Mat):
             for value in components:
                 values.append([value]) 
             super(Vec, self).__init__(values)
-            
-    
-    def _set_mat_parent(self, getter, setter):
-        self._mat_parent = (getter, setter)
             
 
     def copy(self):
@@ -405,12 +425,18 @@ class Vec(Mat):
         s = "<Vec: \n%s>" % self
         return s
     
+    def appended(self, item):
+        new_cells = deepcopy(self.row_major_cells)
+        new_cells.append([item])
+        vec = Mat(new_cells)[0]
+        return vec
+    
     def coordinate_system(self):
         v1 = self
         if abs(v1.x) > abs(v1.y):
-            v2 = Vec(-v1.z, 0, v1.x).normalize()
+            v2 = Vec(-v1.z, 0, v1.x).normalized()
         else:
-            v2 = Vec(0, v1.z, -v1.y).normalize()
+            v2 = Vec(0, v1.z, -v1.y).normalized()
         v3 = cross(v1, v2)
         
         return Mat(v1, v2, v3)
@@ -424,7 +450,7 @@ class Vec(Mat):
         total = reduce_mat(op.add, squared)
         return sqrt(total)
 
-    def normalize(self):
+    def normalized(self):
         m = self.magnitude()
         mat = map_mat(lambda c: c/m, self)
         vec = mat[0].copy()
