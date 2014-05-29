@@ -258,7 +258,14 @@ class Mat(object):
         s = "<Mat: \n%s>" % self
         return s
     
+    @property
+    def raw(self):
+        return self._to_string(False)
+    
     def __str__(self):
+        return self._to_string(True)
+    
+    def _to_string(self, friendly=False):
         """ turns a matrix into something like this:
         
             >>> mat = Mat.new_identity(3)
@@ -268,7 +275,14 @@ class Mat(object):
             | 0 0 1 |
             
         while it takes into account things like the maximum number length, so
-        that all of the columns stay aligned """
+        that all of the columns stay aligned
+        
+        frinedly defaults to True, which states that we use cgla.friendly to
+        convert values in the matrix to their friendlier representations, like
+        0.7071067811865476 to cos(π/4).  sometimes this isn't desired though
+        for example, when you have a regular old 0.5 value, but it gets
+        converted to the non-obvious cos(π/6)
+        """
         
         s = ""
         padding = 0
@@ -278,8 +292,8 @@ class Mat(object):
         # is going to be for all of the cells, based on the longest value
         for y in xrange(self.rows):
             for x in xrange(self.cols):
-                num, num_len = _friendly_value_and_length(self.get_cell(x, y),
-                        precision, self._snap_threshold)
+                num, num_len = _value_and_length(self.get_cell(x, y),
+                        precision, self._snap_threshold, friendly)
                     
                 if num_len > padding:
                     padding = num_len
@@ -289,8 +303,8 @@ class Mat(object):
         for y in xrange(self.rows):
             s += "|"
             for x in xrange(self.cols):
-                num, num_len = _friendly_value_and_length(self.get_cell(x, y),
-                        precision, self._snap_threshold)
+                num, num_len = _value_and_length(self.get_cell(x, y),
+                        precision, self._snap_threshold, friendly)
                     
                 s += " " * (padding-num_len+1)
                 
@@ -654,8 +668,10 @@ def _approx_equal(v1, v2, threshold):
     
 
 
-def _friendly_value_and_length(num, precision, threshold):
-    found = friendly.match(num, threshold)
+def _value_and_length(num, precision, threshold, as_friendly):
+    found = False
+    if as_friendly:
+        found = friendly.match(num, threshold)
     
     if found:
         num_len = len(found.decode("utf8"))
