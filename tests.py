@@ -113,28 +113,39 @@ class VecTests(unittest.TestCase):
         
     def test_translated_2d(self):
         vec = Vec(1, 0)
-        self.assertEqual(vec.translated(1, 4), Vec(2, 4))
+        res = vec.translated(1, 4)
+        self.assertEqual(res, Vec(2, 4))
+        self.assertTrue(isinstance(res, Vec))
         
     def test_translated_3d(self):
         vec = Vec(1, 0, 0)
-        self.assertEqual(vec.translated(1, 2, 3), Vec(2, 2, 3))
+        res = vec.translated(1, 2, 3)
+        self.assertEqual(res, Vec(2, 2, 3))
+        self.assertTrue(isinstance(res, Vec))
         
     def test_scaled_3d(self):
         vec = Vec(4, 1, 3)
-        self.assertEqual(vec.scaled(0.5, 2.0, 1), Vec(2, 2, 3))
+        res = vec.scaled(0.5, 2.0, 1)
+        self.assertEqual(res, Vec(2, 2, 3))
+        self.assertTrue(isinstance(res, Vec))
         
     def test_scaled_2d(self):
         vec = Vec(4, 1)
-        self.assertEqual(vec.scaled(0.5, 2.0), Vec(2, 2))
-        
+        res = vec.scaled(0.5, 2.0)
+        self.assertEqual(res, Vec(2, 2))
+        self.assertTrue(isinstance(res, Vec))
         
     def test_rotated_3d(self):
         vec = Vec(1, 0, 0)
-        self.assertEqual(vec.rotated(0, -pi/2, 0), Vec(0, 0, 1))
+        res = vec.rotated(0, -pi/2, 0)
+        self.assertEqual(res, Vec(0, 0, 1))
+        self.assertTrue(isinstance(res, Vec))
         
     def test_rotated_2d(self):
         vec = Vec(1, 0)
-        self.assertEqual(vec.rotated(pi/2), Vec(0, 1))
+        res = vec.rotated(pi/2)
+        self.assertEqual(res, Vec(0, 1))
+        self.assertTrue(isinstance(res, Vec))
         
         
         
@@ -397,6 +408,20 @@ sin(\xcf\x80/6)         0 |\n| sin(-\xcf\x80/4)      0.35     -0.61         0 \
             [1, 2, 3]
         )
         self.assertEqual(mat, correct)
+        
+        
+    def test_popped(self):
+        mat = Mat(
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        )
+        
+        correct = Mat(
+            [1, 2, 3],
+            [4, 5, 6]
+        )
+        self.assertEqual(mat.popped(), correct)
         
         
     def test_trans_mat(self):

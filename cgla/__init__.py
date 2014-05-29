@@ -328,6 +328,10 @@ class Mat(object):
         new_cells.append(row)
         return Mat(new_cells)
     
+    def popped(self):
+        new_cells = self.row_major_cells[:-1]
+        return Mat(new_cells)
+    
     
     def __add__(self, other):
         assert_same_size(self, other)
@@ -542,7 +546,7 @@ class Vec(Mat):
     def popped(self):
         new_cells = self.row_major_cells[:-1]
         vec = Mat(new_cells)
-        return vec
+        return vec[0]
     
     def appended(self, item):
         new_cells = deepcopy(self.row_major_cells)
