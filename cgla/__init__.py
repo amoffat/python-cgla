@@ -506,11 +506,11 @@ class Vec(Mat):
         mat = Mat.new_translation_3d(x, y, z)
         return self._apply_transformation(mat)
     
-    def translated(self, *args):
+    def translated(self, *args, **kwargs):
         if len(self) == 2:
-            vec = self._translated_2d(*args)
+            vec = self._translated_2d(*args, **kwargs)
         else:
-            vec = self._translated_3d(*args)
+            vec = self._translated_3d(*args, **kwargs)
         return vec
     
     def _scaled_2d(self, x=1, y=1):
@@ -521,11 +521,11 @@ class Vec(Mat):
         mat = Mat.new_scale_3d(x, y, z)
         return self._apply_transformation(mat)
     
-    def scaled(self, *args):
+    def scaled(self, *args, **kwargs):
         if len(self) == 2:
-            vec = self._scaled_2d(*args)
+            vec = self._scaled_2d(*args, **kwargs)
         else:
-            vec = self._scaled_3d(*args)
+            vec = self._scaled_3d(*args, **kwargs)
         return vec
     
     def _rotated_2d(self, angle):
@@ -536,11 +536,11 @@ class Vec(Mat):
         mat = Mat.new_rotation_3d(x, y, z)
         return self._apply_transformation(mat)
     
-    def rotated(self, *args):
+    def rotated(self, *args, **kwargs):
         if len(self) == 2:
             vec = self._rotated_2d(args[0])
         else:
-            vec = self._rotated_3d(*args)
+            vec = self._rotated_3d(*args, **kwargs)
         return vec
     
     def popped(self):
