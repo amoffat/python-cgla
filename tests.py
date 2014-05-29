@@ -111,19 +111,30 @@ class VecTests(unittest.TestCase):
         v = v.appended(4)
         self.assertEqual(v, Vec(1, 2, 3, 4))
         
+    def test_translated_2d(self):
+        vec = Vec(1, 0)
+        self.assertEqual(vec.translated(1, 4), Vec(2, 4))
         
-    def test_translated(self):
+    def test_translated_3d(self):
         vec = Vec(1, 0, 0)
         self.assertEqual(vec.translated(1, 2, 3), Vec(2, 2, 3))
         
-    def test_scaled(self):
+    def test_scaled_3d(self):
         vec = Vec(4, 1, 3)
         self.assertEqual(vec.scaled(0.5, 2.0, 1), Vec(2, 2, 3))
         
+    def test_scaled_2d(self):
+        vec = Vec(4, 1)
+        self.assertEqual(vec.scaled(0.5, 2.0), Vec(2, 2))
         
-    def test_rotated(self):
+        
+    def test_rotated_3d(self):
         vec = Vec(1, 0, 0)
         self.assertEqual(vec.rotated(0, -pi/2, 0), Vec(0, 0, 1))
+        
+    def test_rotated_2d(self):
+        vec = Vec(1, 0)
+        self.assertEqual(vec.rotated(pi/2), Vec(0, 1))
         
         
         
@@ -275,7 +286,7 @@ class MatTests(unittest.TestCase):
         )
         self.assertEqual(str(mat), "|   \xcf\x80 \xcf\x80/2 \xcf\x80/4 |")
         
-        mat = Mat.new_rotation(radians(45), radians(30), radians(270))
+        mat = Mat.new_rotation_3d(radians(45), radians(30), radians(270))
         self.assertEqual(str(mat), "|         0  cos(\xcf\x80/6)  \
 sin(\xcf\x80/6)         0 |\n| sin(-\xcf\x80/4)      0.35     -0.61         0 \
 |\n| sin(-\xcf\x80/4)     -0.35      0.61         0 |\n|         0         0  \
@@ -387,7 +398,7 @@ sin(\xcf\x80/6)         0 |\n| sin(-\xcf\x80/4)      0.35     -0.61         0 \
         
         
     def test_trans_mat(self):
-        mat = Mat.new_translation(1, 2, 3)
+        mat = Mat.new_translation_3d(1, 2, 3)
         correct = Mat(
             [1, 0, 0, 1],
             [0, 1, 0, 2],
@@ -400,7 +411,7 @@ sin(\xcf\x80/6)         0 |\n| sin(-\xcf\x80/4)      0.35     -0.61         0 \
         self.assertEqual(mat * vec, Vec(2, 2, 3, 1))
         
     def test_scale_mat(self):
-        mat = Mat.new_scale(0.5, 2.0, 1)
+        mat = Mat.new_scale_3d(0.5, 2.0, 1)
         correct = Mat(
             [0.5, 0, 0, 0],
             [0, 2.0, 0, 0],
@@ -414,7 +425,7 @@ sin(\xcf\x80/6)         0 |\n| sin(-\xcf\x80/4)      0.35     -0.61         0 \
         
         
     def test_rot_mat(self):
-        rot = Mat.new_rotation()
+        rot = Mat.new_rotation_3d()
         ident = Mat.new_identity(4)
         
         # a rotation matrix with no rotations is just the basis vectors
@@ -423,7 +434,7 @@ sin(\xcf\x80/6)         0 |\n| sin(-\xcf\x80/4)      0.35     -0.61         0 \
         vec = Vec(1, 0, 0, 1)
         self.assertEqual(rot * vec, Vec(1, 0, 0, 1))
         
-        rot = Mat.new_rotation(0, -pi/2, 0)
+        rot = Mat.new_rotation_3d(0, -pi/2, 0)
         self.assertEqual(rot * vec, Vec(0, 0, 1, 1))
         
         

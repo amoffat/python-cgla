@@ -155,9 +155,17 @@ class Mat(object):
         vec._mat_parent = (getter, setter)
         return vec
     
+    @classmethod
+    def new_translation_2d(cls, x=0, y=0):
+        mat = Mat(
+            [1, 0, x],
+            [0, 1, y],
+            [0, 0, 1],
+        )
+        return mat
     
     @classmethod
-    def new_translation(cls, x=0, y=0, z=0):
+    def new_translation_3d(cls, x=0, y=0, z=0):
         mat = Mat(
             [1, 0, 0, x],
             [0, 1, 0, y],
@@ -166,9 +174,17 @@ class Mat(object):
         )
         return mat
     
+    @classmethod
+    def new_scale_2d(cls, x=1, y=1):
+        mat = Mat(
+            [x, 0, 0],
+            [0, y, 0],
+            [0, 0, 1],
+        )
+        return mat
     
     @classmethod
-    def new_scale(cls, x=1, y=1, z=1):
+    def new_scale_3d(cls, x=1, y=1, z=1):
         mat = Mat(
             [x, 0, 0, 0],
             [0, y, 0, 0],
@@ -176,9 +192,18 @@ class Mat(object):
             [0, 0, 0, 1],
         )
         return mat
+    
+    @classmethod
+    def new_rotation_2d(cls, angle):
+        mat = Mat([
+            [cos(angle), -sin(angle), 0],
+            [sin(angle), cos(angle), 0],
+            [0, 0, 1]
+        ])
+        return mat
         
     @classmethod
-    def new_rotation(cls, x=0, y=0, z=0):
+    def new_rotation_3d(cls, x=0, y=0, z=0):
         x_mat = Mat([
             [1, 0, 0, 0],
             [0, cos(x), -sin(x), 0],
@@ -437,32 +462,73 @@ class Vec(Mat):
         s = "<Vec: \n%s>" % self
         return s
     
-    def _potentially_padded(self):
+    def _potentially_padded(self, desired_rows):
+        """ upcasts a vec2 to a vec3 or a vec3 to a vec4 for to be
+        multiplied by a transformation matrix """
+        
         vec = self
         padded = False
-        if len(vec) == 3:
+        if (len(vec), desired_rows) in ((3, 4), (2, 3)):
             vec = vec.appended(1)
             padded = True
         return vec, padded
     
     def _apply_transformation(self, mat):
-        vec, padded = self._potentially_padded()
+        vec, padded = self._potentially_padded(mat.rows)
         res = mat * vec
         if padded:
-            res = Vec(res[:3])
+            res = res.popped()
         return res
     
-    def translated(self, x=0, y=0, z=0):
-        mat = Mat.new_translation(x, y, z)
+    def _translated_2d(self, x=0, y=0):
+        mat = Mat.new_translation_2d(x, y)
         return self._apply_transformation(mat)
     
-    def scaled(self, x=1, y=1, z=1):
-        mat = Mat.new_scale(x, y, z)
+    def _translated_3d(self, x=0, y=0, z=0):
+        mat = Mat.new_translation_3d(x, y, z)
         return self._apply_transformation(mat)
     
-    def rotated(self, x=0, y=0, z=0):
-        mat = Mat.new_rotation(x, y, z)
+    def translated(self, *args):
+        if len(self) == 2:
+            vec = self._translated_2d(*args)
+        else:
+            vec = self._translated_3d(*args)
+        return vec
+    
+    def _scaled_2d(self, x=1, y=1):
+        mat = Mat.new_scale_2d(x, y)
         return self._apply_transformation(mat)
+    
+    def _scaled_3d(self, x=1, y=1, z=1):
+        mat = Mat.new_scale_3d(x, y, z)
+        return self._apply_transformation(mat)
+    
+    def scaled(self, *args):
+        if len(self) == 2:
+            vec = self._scaled_2d(*args)
+        else:
+            vec = self._scaled_3d(*args)
+        return vec
+    
+    def _rotated_2d(self, angle):
+        mat = Mat.new_rotation_2d(angle)
+        return self._apply_transformation(mat)
+    
+    def _rotated_3d(self, x=0, y=0, z=0):
+        mat = Mat.new_rotation_3d(x, y, z)
+        return self._apply_transformation(mat)
+    
+    def rotated(self, *args):
+        if len(self) == 2:
+            vec = self._rotated_2d(args[0])
+        else:
+            vec = self._rotated_3d(*args)
+        return vec
+    
+    def popped(self):
+        new_cells = self.row_major_cells[:-1]
+        vec = Mat(new_cells)
+        return vec
     
     def appended(self, item):
         new_cells = deepcopy(self.row_major_cells)
