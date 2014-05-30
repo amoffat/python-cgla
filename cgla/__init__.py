@@ -554,15 +554,29 @@ class Vec(Mat):
         vec = Mat(new_cells)[0]
         return vec
     
-    def coordinate_system(self):
+    def _coordinate_system_2d(self):
+        v1 = self
+        v2 = v1.rotated(pi/2)
+        mat = Mat(v1, v2)
+        return mat
+    
+    def _coordinate_system_3d(self):
         v1 = self
         if abs(v1.x) > abs(v1.y):
             v2 = Vec(-v1.z, 0, v1.x).normalized()
         else:
             v2 = Vec(0, v1.z, -v1.y).normalized()
+            
         v3 = cross(v1, v2)
+        mat = Mat(v1, v2, v3)
         
-        return Mat(v1, v2, v3)
+        return mat
+    
+    def coordinate_system(self):
+        if len(self) == 2:
+            return self._coordinate_system_2d()
+        else:
+            return self._coordinate_system_3d()
             
         
     def distance(self, other):

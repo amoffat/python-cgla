@@ -95,7 +95,17 @@ class VecTests(unittest.TestCase):
         self.assertEqual(Mat.new_identity(3).row(0).to_dict(),
                 {"x": 1, "y": 0, "z": 0})
         
-    def test_coordinate_system(self):
+    def test_coordinate_system_2d(self):
+        v = Vec(1, 0)
+        mat = v.coordinate_system()
+        
+        correct = Mat(
+            [1, 0],
+            [0, 1],
+        )
+        self.assertEqual(mat, correct)
+        
+    def test_coordinate_system_3d(self):
         v = Vec(1, 0, 0)
         mat = v.coordinate_system()
         
