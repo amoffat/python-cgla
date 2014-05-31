@@ -96,7 +96,7 @@ class Mat(object):
         
         
     def set_cell(self, col, row, value):
-        self.col_major_cells[col][row] = value
+        self.col_major_cells[col][row] = value 
         self.row_major_cells[row][col] = value
         
     def get_cell(self, x, y):
@@ -321,11 +321,32 @@ class Mat(object):
     
     
     def appended(self, row):
-        """ this method is appended, and not "append", because it does not
-        mutate the existing Mat/Vec, it returns a new one with the new data
-        appended """
+        """ appends a row.  this method is appended, and not "append", because
+        it does not mutate the existing Mat/Vec, it returns a new one with
+        the new data appended """
+        if len(self.col_major_cells) != len(row):
+            raise InvalidSizes
+        
         new_cells = deepcopy(self.row_major_cells)
         new_cells.append(row)
+        return Mat(new_cells)
+    
+    def transpose(self):
+        mat = Mat(self.rows, self.cols)
+        mat.row_major_cells = deepcopy(self.col_major_cells)
+        mat.col_major_cells = deepcopy(self.row_major_cells)
+        return mat
+    
+    def appended_col(self, col):
+        """ appends a column """
+        if len(self.row_major_cells) != len(col):
+            raise InvalidSizes
+        
+        new_cells = deepcopy(self.row_major_cells)
+        
+        for row, ((_, _), value) in zip(new_cells, col):
+            row.append(value)
+            
         return Mat(new_cells)
     
     def popped(self):
@@ -336,6 +357,11 @@ class Mat(object):
     def __add__(self, other):
         assert_same_size(self, other)
         result = pair_map(op.add, self, other)
+        return result
+    
+    def __sub__(self, other):
+        assert_same_size(self, other)
+        result = pair_map(op.sub, self, other)
         return result
     
     
@@ -363,7 +389,10 @@ class Mat(object):
             
         # a scalar              
         else:
-            return map_mat(lambda c: c*other, self)
+            result = map_mat(lambda c: c*other, self)
+            if isinstance(self, Vec):
+                result = result[0]
+            return result
         
     
     def __neg__(self):
@@ -475,6 +504,19 @@ class Vec(Mat):
     def __getattr__(self, name):
         i = self._component_mapping[name]
         return self.get_cell(0, i)
+    
+    
+    def __add__(self, other):
+        res = super(Vec, self).__add__(other)
+        if isinstance(other, Vec):
+            res = res[0]
+        return res
+    
+    def __sub__(self, other):
+        res = super(Vec, self).__sub__(other)
+        if isinstance(other, Vec):
+            res = res[0]
+        return res
             
     def __repr__(self):
         s = "<Vec: \n%s>" % self
@@ -542,6 +584,26 @@ class Vec(Mat):
         else:
             vec = self._rotated_3d(*args, **kwargs)
         return vec
+    
+    def rotated_around(self, axis, angle):
+        ref_mat = Mat.new_rotation_3d(0, 0, angle).transpose()
+        
+        axis = axis.normalized()
+        
+        back = axis
+        dp = dot(self, axis)
+        
+        right = self - (axis * dp)
+        up = cross(back, right)
+        
+        rotated = Mat(right, up, back)
+        rotated = rotated.appended_col(Vec(0, 0, 0))
+        rotated = rotated.appended(Vec(0, 0, 0, 1))
+        
+        rotated_ref = ref_mat * rotated
+        new_right = rotated_ref.row(0).popped()
+        return new_right
+        
     
     def popped(self):
         new_cells = self.row_major_cells[:-1]

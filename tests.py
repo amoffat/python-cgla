@@ -158,6 +158,14 @@ class VecTests(unittest.TestCase):
         self.assertTrue(isinstance(res, Vec))
         
         
+    def test_rotated_around(self):
+        vec = Vec(1, 0, 0)
+        axis = Vec(0, 0, 1)
+        
+        res = vec.rotated_around(axis, pi/4)
+        self.assertEqual(res, Vec(1, 1, 0).normalized())
+        
+        
         
 class MatTests(unittest.TestCase):
     def test_square_mat(self):
@@ -418,6 +426,53 @@ sin(\xcf\x80/6)         0 |\n| sin(-\xcf\x80/4)      0.35     -0.61         0 \
             [1, 2, 3]
         )
         self.assertEqual(mat, correct)
+        
+        
+    def test_appended_col(self):
+        mat = Mat(
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
+        )
+        mat = mat.appended_col(Vec(1, 2, 3))
+        
+        correct = Mat(
+            [1, 2, 3, 1],
+            [4, 5, 6, 2],
+            [7, 8, 9, 3],
+        )
+        self.assertEqual(mat, correct)
+        
+    def test_transpose(self):
+        mat = Mat(
+            [1, 2]
+        )
+        correct = Mat(
+            [1],
+            [2],
+        )
+        self.assertEqual(mat.transpose(), correct)
+        
+        mat = Mat(
+            [1, 2],
+            [3, 4],
+        )
+        correct = Mat(
+            [1, 3],
+            [2, 4]
+        )
+        self.assertEqual(mat.transpose(), correct)
+        
+        mat = Mat(
+            [1, 2],
+            [3, 4],
+            [5, 6],
+        )
+        correct = Mat(
+            [1, 3, 5],
+            [2, 4, 6]
+        )
+        self.assertEqual(mat.transpose(), correct)
         
         
     def test_popped(self):
