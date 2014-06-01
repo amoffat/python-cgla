@@ -38,7 +38,7 @@ def distance(v1, v2):
     
 
 class Mat(object):
-    _snap_threshold = 0.000000001
+    _comparison_accuracy = 0.000000001
     
     
     def __init__(self, *args):
@@ -231,10 +231,11 @@ class Mat(object):
         return final_mat
             
             
-    def set_snap_threshold(self, value):
-        """ adjusts the snap threshold of the matrix.  this effects things like
-        equality comparisons and rounding cells to specific values on printing"""
-        self._snap_threshold = value
+    def set_comparison_accuracy(self, value):
+        """ adjusts the comparison threshold of the matrix.  this effects things
+        like equality comparisons and rounding cells to specific values on
+        printing """
+        self._comparison_accuracy = value
           
     @classmethod  
     def new_identity(cls, size):
@@ -296,7 +297,7 @@ class Mat(object):
         for y in xrange(self.rows):
             for x in xrange(self.cols):
                 num, num_len = _value_and_length(self.get_cell(x, y),
-                        precision, self._snap_threshold, friendly)
+                        precision, self._comparison_accuracy, friendly)
                     
                 if num_len > padding:
                     padding = num_len
@@ -307,7 +308,7 @@ class Mat(object):
             s += "|"
             for x in xrange(self.cols):
                 num, num_len = _value_and_length(self.get_cell(x, y),
-                        precision, self._snap_threshold, friendly)
+                        precision, self._comparison_accuracy, friendly)
                     
                 s += " " * (padding-num_len+1)
                 
@@ -411,7 +412,7 @@ class Mat(object):
         # matrices and vectors that ARE equivalent, but which have non-equal
         # components due to floating point math
         def compare(cell1, cell2):
-            if not _approx_equal(cell1, cell2, self._snap_threshold):
+            if not _approx_equal(cell1, cell2, self._comparison_accuracy):
                 raise ValueError
             
         try:

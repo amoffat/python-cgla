@@ -169,7 +169,7 @@ class VecTests(unittest.TestCase):
         res = vec.rotated_around(axis, pi/4)
         
         # for the sake of this comparison, let's lower the equality threshold
-        res.set_snap_threshold(0.00001)
+        res.set_comparison_accuracy(0.00001)
         self.assertEqual(res, Vec(0.804738, 0.505879, -0.310617))
         
         
