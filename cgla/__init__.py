@@ -42,6 +42,8 @@ class Mat(object):
     
     
     def __init__(self, *args):
+        self._friendly = True
+        
         # if the first item is iterable, we've either passed in a multiple lists
         # or a single list of lists.  the end result must be a list of lists
         if is_iterable(args[0]):
@@ -258,12 +260,13 @@ class Mat(object):
         s = "<Mat: \n%s>" % self
         return s
     
-    @property
     def raw(self):
-        return self._to_string(False)
+        mat = self.copy()
+        mat._friendly = False
+        return mat
     
     def __str__(self):
-        return self._to_string(True)
+        return self._to_string(self._friendly)
     
     def _to_string(self, friendly=False):
         """ turns a matrix into something like this:
@@ -318,7 +321,6 @@ class Mat(object):
             
         s = s.rstrip()
         return s
-    
     
     def appended(self, row):
         """ appends a row.  this method is appended, and not "append", because
