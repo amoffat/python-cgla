@@ -320,15 +320,15 @@ class MatTests(unittest.TestCase):
         mat = Mat(
             [pi, pi/2, pi/4],            
         )
-        self.assertEqual(str(mat), "|   \xcf\x80 \xcf\x80/2 \xcf\x80/4 |")
+        self.assertEqual(str(mat.friendly()), "|   \xcf\x80 \xcf\x80/2 \xcf\x80/4 |")
         
         mat = Mat.new_rotation_3d(radians(45), radians(30), radians(270))
-        self.assertEqual(str(mat), "|         0  cos(\xcf\x80/6)  \
+        self.assertEqual(str(mat.friendly()), "|         0  cos(\xcf\x80/6)  \
 sin(\xcf\x80/6)         0 |\n| sin(-\xcf\x80/4)      0.35     -0.61         0 \
 |\n| sin(-\xcf\x80/4)     -0.35      0.61         0 |\n|         0         0  \
        0         1 |")
         
-        self.assertEqual(str(mat.raw()), "| -0.00  0.87  0.50  0.00 |\n| -0.71  \
+        self.assertEqual(str(mat), "| -0.00  0.87  0.50  0.00 |\n| -0.71  \
 0.35 -0.61  0.00 |\n| -0.71 -0.35  0.61  0.00 |\n|  0.00  0.00  0.00  1.00 |")
         
         

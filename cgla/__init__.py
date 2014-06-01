@@ -42,7 +42,7 @@ class Mat(object):
     
     
     def __init__(self, *args):
-        self._friendly = True
+        self._friendly = False
         
         # if the first item is iterable, we've either passed in a multiple lists
         # or a single list of lists.  the end result must be a list of lists
@@ -260,9 +260,9 @@ class Mat(object):
         s = "<Mat: \n%s>" % self
         return s
     
-    def raw(self):
+    def friendly(self):
         mat = self.copy()
-        mat._friendly = False
+        mat._friendly = True
         return mat
     
     def __str__(self):
