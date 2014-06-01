@@ -588,23 +588,43 @@ class Vec(Mat):
         return vec
     
     def rotated_around(self, axis, angle):
-        ref_mat = Mat.new_rotation_3d(0, 0, angle).transpose()
+        """ returns a vector representing a rotation about axis by angle """
         
         axis = axis.normalized()
         
-        back = axis
-        dp = dot(self, axis)
+        # first we get a reference rotation matrix where the z-axis is
+        # pretending to be the axis we passed in
+        ref_mat = Mat.new_rotation_3d(0, 0, angle)
         
-        right = self - (axis * dp)
+        # ensure that the axis is normalized
+        axis = axis.normalized()
+        
+        # back is just going to be the rotation axis
+        back = axis
+        
+        # right is the projection of our vector onto the axis vector, turned
+        # into a vector... axis * dot(self, axis)
+        dp = dot(self, axis)
+        right = (self - (axis * dp)).normalized()
+        
+        # and lastly up is orthogonal to back and right
         up = cross(back, right)
         
+        # let's create a rotation matrix that moves our axis's coordinate
+        # system back to the standard coordinate system
         rotated = Mat(right, up, back)
         rotated = rotated.appended_col(Vec(0, 0, 0))
         rotated = rotated.appended(Vec(0, 0, 0, 1))
         
-        rotated_ref = ref_mat * rotated
-        new_right = rotated_ref.row(0).popped()
-        return new_right
+        # our transformation matrix behaves as follows (reading right to left):
+        # first we rotate our axis coordinate system into default coordinate
+        # system space, aligning the rotation axis to the z-axis.  then we
+        # rotate around the z-axis.  finally we rotate back into our axis
+        # space.  this matrix will then be applied to our vector (self)
+        mat = rotated.transpose() * ref_mat * rotated
+        
+        res = self._apply_transformation(mat)
+        return res
         
     
     def popped(self):
