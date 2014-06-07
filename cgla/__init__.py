@@ -639,13 +639,17 @@ class Vec(Mat):
         vec = Mat(new_cells)[0]
         return vec
     
-    def _coordinate_system_2d(self):
+    def _coordinate_system_2d(self, index):
         v1 = self
         v2 = v1.rotated(pi/2)
-        mat = Mat(v1, v2)
+        
+        rows = [v1, v2]
+        # rotate our list such that v1 is the vector at index
+        rows = _rotate_list(rows, index)   
+        mat = Mat(rows)
         return mat
     
-    def _coordinate_system_3d(self):
+    def _coordinate_system_3d(self, index):
         v1 = self
         if abs(v1.x) > abs(v1.y):
             v2 = Vec(-v1.z, 0, v1.x).normalized()
@@ -653,15 +657,20 @@ class Vec(Mat):
             v2 = Vec(0, v1.z, -v1.y).normalized()
             
         v3 = cross(v1, v2)
-        mat = Mat(v1, v2, v3)
+        
+        rows = [v1, v2, v3]
+        
+        # rotate our list such that v1 is the vector at index
+        rows = _rotate_list(rows, index)
+        mat = Mat(rows)
         
         return mat
     
-    def coordinate_system(self):
+    def coordinate_system(self, optional_idx=0):
         if len(self) == 2:
-            return self._coordinate_system_2d()
+            return self._coordinate_system_2d(optional_idx)
         else:
-            return self._coordinate_system_3d()
+            return self._coordinate_system_3d(optional_idx)
             
         
     def distance(self, other):
@@ -769,6 +778,8 @@ def is_iterable(obj):
 def _approx_equal(v1, v2, threshold):
     return abs(v1 - v2) < threshold
     
+def _rotate_list(l, n):
+    return l[-n:] + l[:-n]
 
 
 def _value_and_length(num, precision, threshold, as_friendly):
